@@ -68,21 +68,21 @@
     <Compile Include="DB\MySQL\Query\UserInfo.cs" />
     <Compile Include="DB\MySQL\ResultSet.cs" />
     <Compile Include="DB\MySQL\ResultSet_Extension.cs" />
-    <Compile Include="ErrorCode.cs" />
+    <Compile Include="Patch\ErrorCode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReqUserLogin.cs" />
-    <Compile Include="ResultCalc.cs" />
-    <Compile Include="ResultUserLogin.cs" />
-    <Compile Include="RplUserLogin.cs" />
+    <Compile Include="Patch\ReqUserLogin.cs" />
+    <Compile Include="Patch\ResultCalc.cs" />
+    <Compile Include="Patch\ResultUserLogin.cs" />
+    <Compile Include="Patch\RplUserLogin.cs" />
     <Compile Include="Server.cs" />
-    <Compile Include="Service.cs" />
-    <Compile Include="UserStatusType.cs" />
+    <Compile Include="Patch\Service.cs" />
+    <Compile Include="Patch\UserStatusType.cs" />
     <Compile Include="Utility\Convert.cs" />
     <Compile Include="Utility\Log.cs" />
     <Compile Include="Utility\Random.cs" />
     <Compile Include="Utility\Runtime_Error.cs" />
-    <Compile Include="Work.cs" />
+    <Compile Include="Patch\Work.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
