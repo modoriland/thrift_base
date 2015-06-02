@@ -24,6 +24,11 @@ namespace Paul
       IAsyncResult Begin_checkcalc(AsyncCallback callback, object state, int a, int b);
       List<Work> End_checkcalc(IAsyncResult asyncResult);
       #endif
+      RplUserLogin ulogin(ReqUserLogin a);
+      #if SILVERLIGHT
+      IAsyncResult Begin_ulogin(AsyncCallback callback, object state, ReqUserLogin a);
+      RplUserLogin End_ulogin(IAsyncResult asyncResult);
+      #endif
     }
 
     public class Client : IDisposable, Iface {
@@ -145,12 +150,75 @@ namespace Paul
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "checkcalc failed: unknown result");
       }
 
+      
+      #if SILVERLIGHT
+      public IAsyncResult Begin_ulogin(AsyncCallback callback, object state, ReqUserLogin a)
+      {
+        return send_ulogin(callback, state, a);
+      }
+
+      public RplUserLogin End_ulogin(IAsyncResult asyncResult)
+      {
+        oprot_.Transport.EndFlush(asyncResult);
+        return recv_ulogin();
+      }
+
+      #endif
+
+      public RplUserLogin ulogin(ReqUserLogin a)
+      {
+        #if !SILVERLIGHT
+        send_ulogin(a);
+        return recv_ulogin();
+
+        #else
+        var asyncResult = Begin_ulogin(null, null, a);
+        return End_ulogin(asyncResult);
+
+        #endif
+      }
+      #if SILVERLIGHT
+      public IAsyncResult send_ulogin(AsyncCallback callback, object state, ReqUserLogin a)
+      #else
+      public void send_ulogin(ReqUserLogin a)
+      #endif
+      {
+        oprot_.WriteMessageBegin(new TMessage("ulogin", TMessageType.Call, seqid_));
+        ulogin_args args = new ulogin_args();
+        args.A = a;
+        args.Write(oprot_);
+        oprot_.WriteMessageEnd();
+        #if SILVERLIGHT
+        return oprot_.Transport.BeginFlush(callback, state);
+        #else
+        oprot_.Transport.Flush();
+        #endif
+      }
+
+      public RplUserLogin recv_ulogin()
+      {
+        TMessage msg = iprot_.ReadMessageBegin();
+        if (msg.Type == TMessageType.Exception) {
+          TApplicationException x = TApplicationException.Read(iprot_);
+          iprot_.ReadMessageEnd();
+          throw x;
+        }
+        ulogin_result result = new ulogin_result();
+        result.Read(iprot_);
+        iprot_.ReadMessageEnd();
+        if (result.__isset.success) {
+          return result.Success;
+        }
+        throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "ulogin failed: unknown result");
+      }
+
     }
     public class Processor : TProcessor {
       public Processor(Iface iface)
       {
         iface_ = iface;
         processMap_["checkcalc"] = checkcalc_Process;
+        processMap_["ulogin"] = ulogin_Process;
       }
 
       protected delegate void ProcessFunction(int seqid, TProtocol iprot, TProtocol oprot);
@@ -191,6 +259,19 @@ namespace Paul
         checkcalc_result result = new checkcalc_result();
         result.Success = iface_.checkcalc(args.A, args.B);
         oprot.WriteMessageBegin(new TMessage("checkcalc", TMessageType.Reply, seqid)); 
+        result.Write(oprot);
+        oprot.WriteMessageEnd();
+        oprot.Transport.Flush();
+      }
+
+      public void ulogin_Process(int seqid, TProtocol iprot, TProtocol oprot)
+      {
+        ulogin_args args = new ulogin_args();
+        args.Read(iprot);
+        iprot.ReadMessageEnd();
+        ulogin_result result = new ulogin_result();
+        result.Success = iface_.ulogin(args.A);
+        oprot.WriteMessageBegin(new TMessage("ulogin", TMessageType.Reply, seqid)); 
         result.Write(oprot);
         oprot.WriteMessageEnd();
         oprot.Transport.Flush();
@@ -432,6 +513,195 @@ namespace Paul
           __first = false;
           __sb.Append("Success: ");
           __sb.Append(Success);
+        }
+        __sb.Append(")");
+        return __sb.ToString();
+      }
+
+    }
+
+
+    #if !SILVERLIGHT
+    [Serializable]
+    #endif
+    public partial class ulogin_args : TBase
+    {
+      private ReqUserLogin _a;
+
+      public ReqUserLogin A
+      {
+        get
+        {
+          return _a;
+        }
+        set
+        {
+          __isset.a = true;
+          this._a = value;
+        }
+      }
+
+
+      public Isset __isset;
+      #if !SILVERLIGHT
+      [Serializable]
+      #endif
+      public struct Isset {
+        public bool a;
+      }
+
+      public ulogin_args() {
+      }
+
+      public void Read (TProtocol iprot)
+      {
+        TField field;
+        iprot.ReadStructBegin();
+        while (true)
+        {
+          field = iprot.ReadFieldBegin();
+          if (field.Type == TType.Stop) { 
+            break;
+          }
+          switch (field.ID)
+          {
+            case 1:
+              if (field.Type == TType.Struct) {
+                A = new ReqUserLogin();
+                A.Read(iprot);
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
+            default: 
+              TProtocolUtil.Skip(iprot, field.Type);
+              break;
+          }
+          iprot.ReadFieldEnd();
+        }
+        iprot.ReadStructEnd();
+      }
+
+      public void Write(TProtocol oprot) {
+        TStruct struc = new TStruct("ulogin_args");
+        oprot.WriteStructBegin(struc);
+        TField field = new TField();
+        if (A != null && __isset.a) {
+          field.Name = "a";
+          field.Type = TType.Struct;
+          field.ID = 1;
+          oprot.WriteFieldBegin(field);
+          A.Write(oprot);
+          oprot.WriteFieldEnd();
+        }
+        oprot.WriteFieldStop();
+        oprot.WriteStructEnd();
+      }
+
+      public override string ToString() {
+        StringBuilder __sb = new StringBuilder("ulogin_args(");
+        bool __first = true;
+        if (A != null && __isset.a) {
+          if(!__first) { __sb.Append(", "); }
+          __first = false;
+          __sb.Append("A: ");
+          __sb.Append(A== null ? "<null>" : A.ToString());
+        }
+        __sb.Append(")");
+        return __sb.ToString();
+      }
+
+    }
+
+
+    #if !SILVERLIGHT
+    [Serializable]
+    #endif
+    public partial class ulogin_result : TBase
+    {
+      private RplUserLogin _success;
+
+      public RplUserLogin Success
+      {
+        get
+        {
+          return _success;
+        }
+        set
+        {
+          __isset.success = true;
+          this._success = value;
+        }
+      }
+
+
+      public Isset __isset;
+      #if !SILVERLIGHT
+      [Serializable]
+      #endif
+      public struct Isset {
+        public bool success;
+      }
+
+      public ulogin_result() {
+      }
+
+      public void Read (TProtocol iprot)
+      {
+        TField field;
+        iprot.ReadStructBegin();
+        while (true)
+        {
+          field = iprot.ReadFieldBegin();
+          if (field.Type == TType.Stop) { 
+            break;
+          }
+          switch (field.ID)
+          {
+            case 0:
+              if (field.Type == TType.Struct) {
+                Success = new RplUserLogin();
+                Success.Read(iprot);
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
+            default: 
+              TProtocolUtil.Skip(iprot, field.Type);
+              break;
+          }
+          iprot.ReadFieldEnd();
+        }
+        iprot.ReadStructEnd();
+      }
+
+      public void Write(TProtocol oprot) {
+        TStruct struc = new TStruct("ulogin_result");
+        oprot.WriteStructBegin(struc);
+        TField field = new TField();
+
+        if (this.__isset.success) {
+          if (Success != null) {
+            field.Name = "Success";
+            field.Type = TType.Struct;
+            field.ID = 0;
+            oprot.WriteFieldBegin(field);
+            Success.Write(oprot);
+            oprot.WriteFieldEnd();
+          }
+        }
+        oprot.WriteFieldStop();
+        oprot.WriteStructEnd();
+      }
+
+      public override string ToString() {
+        StringBuilder __sb = new StringBuilder("ulogin_result(");
+        bool __first = true;
+        if (Success != null && __isset.success) {
+          if(!__first) { __sb.Append(", "); }
+          __first = false;
+          __sb.Append("Success: ");
+          __sb.Append(Success== null ? "<null>" : Success.ToString());
         }
         __sb.Append(")");
         return __sb.ToString();

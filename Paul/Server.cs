@@ -8,7 +8,26 @@ namespace Paul
 {
     public class Server : Service.Iface
     {
+        private DB.MySQL.ConnectionString _connectionString =
+            new DB.MySQL.ConnectionString("localhost", 3306, "dbase","paul","pw");
         public Server() { }
+
+        public RplUserLogin ulogin(ReqUserLogin userData)
+        { 
+            RplUserLogin ret = new RplUserLogin();
+
+            var userInfo = Paul.Cache.UserData.UserList.Get((ulong)userData.UserSerial);
+
+            if (null != userInfo)
+            {
+                ret.UserSerial = (long)userInfo.userSerial;
+                ret.Id = userInfo.userName;
+                ret.Result = ResultUserLogin.Success;
+            }
+
+            return ret;
+        }
+
         public List<Work> checkcalc(int a, int b)
         {
             StringBuilder sb = new StringBuilder();
